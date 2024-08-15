@@ -1,5 +1,7 @@
 import Config
 
+config :fortymm, :seeds, users: true
+
 # Configure your database
 config :fortymm, Fortymm.Repo,
   username: "postgres",
