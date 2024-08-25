@@ -10,10 +10,21 @@ defmodule FortymmWeb.DashboardLiveTest do
       |> log_in_user(user_fixture())
       |> live(~p"/dashboard")
 
-    assert html =~ "Dashboard"
+    assert html =~ "Challenge A Friend"
   end
 
   test "redirects to the log in page if nobody is logged in", %{conn: conn} do
     assert {:error, {:redirect, %{to: "/users/log_in"}}} = live(conn, ~p"/dashboard")
+  end
+
+  test "redirects to the challenge page when a challenge is created", %{conn: conn} do
+    conn = log_in_user(conn, user_fixture())
+
+    {:ok, lv, _html} = live(conn, ~p"/dashboard")
+
+    assert {:error, {:redirect, %{to: "/challenges/" <> _slug}}} =
+             lv
+             |> form("#challenge-to-one-game", %{maximum_number_of_games: 1})
+             |> render_submit()
   end
 end
