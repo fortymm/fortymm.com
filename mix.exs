@@ -32,6 +32,7 @@ defmodule Fortymm.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:qr_code, "~> 3.0.0"},
       {:bcrypt_elixir, "~> 3.0"},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
       {:phoenix, "~> 1.7.14"},

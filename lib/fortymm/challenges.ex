@@ -7,4 +7,8 @@ defmodule Fortymm.Challenges do
     |> Challenge.create_changeset(attrs)
     |> Repo.insert()
   end
+
+  def get_challenge_by_slug!(slug) do
+    Repo.get_by!(Challenge, slug: slug)
+  end
 end

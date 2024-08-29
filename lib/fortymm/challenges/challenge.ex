@@ -4,6 +4,7 @@ defmodule Fortymm.Challenges.Challenge do
 
   alias Fortymm.Matches.Match
   alias Fortymm.Accounts.User
+  alias Fortymm.Repo
 
   schema "challenges" do
     field :canceled_on, :utc_datetime
@@ -14,6 +15,10 @@ defmodule Fortymm.Challenges.Challenge do
     belongs_to :match, Match
 
     timestamps(type: :utc_datetime)
+  end
+
+  def preload_created_by(query) do
+    Repo.preload(query, :created_by)
   end
 
   def create_changeset(challenge, attrs) do
