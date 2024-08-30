@@ -42,4 +42,41 @@ defmodule FortymmWeb.ChallengeLiveTest do
 
     assert html =~ "#{challenger.username} has challenged you!"
   end
+
+  test "allows creating the match when the creator is not logged in", %{conn: conn} do
+    challenger = user_fixture()
+    challenge = challenge_fixture(%{created_by_id: challenger.id})
+
+    {:ok, lv, _html} =
+      conn
+      |> log_in_user(user_fixture())
+      |> live(~p"/challenges/#{challenge.slug}")
+
+    assert {:error, {:redirect, %{to: "/matches/" <> _match_id}}} =
+             lv
+             |> element("#accept-challenge-form")
+             |> render_submit()
+  end
+
+  test "redirects to the match page after creating the match", %{conn: conn} do
+    challenger = user_fixture()
+    challenge = challenge_fixture(%{created_by_id: challenger.id})
+
+    {:ok, lv, _html} =
+      conn
+      |> log_in_user(user_fixture())
+      |> live(~p"/challenges/#{challenge.slug}")
+
+    {:error, {:redirect, %{to: "/matches/" <> match_id}}} =
+      lv
+      |> element("#accept-challenge-form")
+      |> render_submit()
+
+    redirect_url = "/matches/#{match_id}"
+
+    assert {:error, {:redirect, %{to: ^redirect_url}}} =
+             conn
+             |> log_in_user(user_fixture())
+             |> live(~p"/challenges/#{challenge.slug}")
+  end
 end
