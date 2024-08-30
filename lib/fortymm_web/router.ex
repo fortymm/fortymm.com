@@ -19,6 +19,8 @@ defmodule FortymmWeb.Router do
 
   scope "/", FortymmWeb do
     pipe_through :browser
+
+    live "/matches/:id", MatchLive, :show
   end
 
   # Other scopes may use custom stacks.

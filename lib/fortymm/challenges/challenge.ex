@@ -21,6 +21,13 @@ defmodule Fortymm.Challenges.Challenge do
     Repo.preload(query, :created_by)
   end
 
+  def set_match_changeset(challenge, match) do
+    challenge
+    |> cast(%{}, [])
+    |> put_change(:match_id, match.id)
+    |> foreign_key_constraint(:match_id)
+  end
+
   def create_changeset(challenge, attrs) do
     challenge
     |> cast(attrs, [:maximum_number_of_games, :created_by_id])

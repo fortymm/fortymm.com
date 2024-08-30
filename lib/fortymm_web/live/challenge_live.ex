@@ -2,13 +2,25 @@ defmodule FortymmWeb.ChallengeLive do
   use FortymmWeb, :live_view
 
   alias Fortymm.Challenges
+  alias Fortymm.Matches
   alias Fortymm.Challenges.Challenge
 
   def handle_params(%{"slug" => slug}, uri, socket) do
-    {:noreply,
-     socket
-     |> assign(uri: uri)
-     |> assign(challenge: load_challenge!(slug))}
+    challenge = load_challenge!(slug)
+
+    case challenge.match_id do
+      nil ->
+        {:noreply,
+         socket
+         |> assign(uri: uri)
+         |> assign(challenge: challenge)}
+
+      match_id ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "The challenge has already been accepted")
+         |> redirect(to: ~p"/matches/#{match_id}")}
+    end
   end
 
   def render(assigns) do
@@ -18,6 +30,27 @@ defmodule FortymmWeb.ChallengeLive do
 
       true ->
         challenge_response(assigns)
+    end
+  end
+
+  def handle_event("accept_challenge", _unsigned_params, socket) do
+    %{current_user: current_user, challenge: challenge} = socket.assigns
+
+    cond do
+      current_user.id == challenge.created_by_id ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "You can't accept your own challenge")}
+
+      true ->
+        with {:ok, match} <- Matches.create_match(challenge) do
+          {:noreply, redirect(socket, to: ~p"/matches/#{match.id}")}
+        else
+          _ ->
+            {:noreply,
+             socket
+             |> put_flash(:error, "Error accepting challenge")}
+        end
     end
   end
 
@@ -88,6 +121,16 @@ defmodule FortymmWeb.ChallengeLive do
             <% end %>
           </p>
         </div>
+        <.simple_form
+          for={}
+          phx-submit="accept_challenge"
+          class="flex justify-center"
+          id="accept-challenge-form"
+        >
+          <.button>
+            Accept the challenge
+          </.button>
+        </.simple_form>
       </div>
     </section>
     """
