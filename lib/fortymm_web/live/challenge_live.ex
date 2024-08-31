@@ -1,12 +1,18 @@
 defmodule FortymmWeb.ChallengeLive do
+  alias Fortymm.Challenges.Updates
   use FortymmWeb, :live_view
 
   alias Fortymm.Challenges
   alias Fortymm.Matches
   alias Fortymm.Challenges.Challenge
+  alias Fortymm.Challenges.Updates
 
   def handle_params(%{"slug" => slug}, uri, socket) do
     challenge = load_challenge!(slug)
+
+    if connected?(socket) do
+      Updates.subscribe(challenge.id)
+    end
 
     case challenge.match_id do
       nil ->
@@ -31,6 +37,10 @@ defmodule FortymmWeb.ChallengeLive do
       true ->
         challenge_response(assigns)
     end
+  end
+
+  def handle_info(challenge, socket) do
+    {:noreply, redirect(socket, to: ~p"/matches/#{challenge.match_id}")}
   end
 
   def handle_event("accept_challenge", _unsigned_params, socket) do
