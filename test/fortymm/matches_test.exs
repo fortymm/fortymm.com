@@ -1,4 +1,5 @@
 defmodule Fortymm.MatchesTest do
+  alias Fortymm.Challenges.Updates
   use Fortymm.DataCase
 
   alias Fortymm.Matches
@@ -33,6 +34,17 @@ defmodule Fortymm.MatchesTest do
 
   test "create_match/1 returns an error with invalid input" do
     assert {:error, _changeset} = Matches.create_match(%Challenge{})
+  end
+
+  test "create_match/1 broadcasts a challenge update" do
+    challenge = challenge_fixture()
+    Updates.subscribe(challenge.id)
+
+    assert {:ok, match} = Matches.create_match(challenge)
+
+    assert_receive challenge_update
+    assert challenge_update.match_id == match.id
+    assert challenge_update.id == challenge.id
   end
 
   test "create_match/1 returns an error when a match has already been created for a challenge" do

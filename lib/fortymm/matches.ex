@@ -1,4 +1,5 @@
 defmodule Fortymm.Matches do
+  alias Fortymm.Challenges.Updates
   alias Fortymm.Repo
   alias Fortymm.Challenges.Challenge
   alias Fortymm.Matches.Match
@@ -13,7 +14,7 @@ defmodule Fortymm.Matches do
   def create_match(%Challenge{id: nil}), do: {:error, :invalid_challenge}
 
   def create_match(%Challenge{id: challenge_id} = challenge) do
-    {:ok, %{match: match}} =
+    {:ok, %{match: match, challenge: challenge}} =
       Multi.new()
       |> Multi.one(
         :existing_challenge,
@@ -30,6 +31,8 @@ defmodule Fortymm.Matches do
         end
       )
       |> Repo.transaction()
+
+    Updates.broadcast(challenge)
 
     {:ok, match}
   end
