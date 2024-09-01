@@ -2,6 +2,17 @@ defmodule FortymmWeb.DashboardLive do
   use FortymmWeb, :live_view
 
   alias Fortymm.Challenges
+  alias Fortymm.Matches
+
+  def mount(_params, _session, socket) do
+    %{current_user: current_user} = socket.assigns
+
+    matches = Matches.list_matches_for_user(current_user)
+
+    {:ok,
+     socket
+     |> assign(:matches, matches)}
+  end
 
   def handle_event(
         "create_challenge",

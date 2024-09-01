@@ -1,9 +1,11 @@
 defmodule Fortymm.MatchesFixtures do
   import Fortymm.ChallengesFixtures
+  import Fortymm.AccountsFixtures
 
   def match_fixture() do
     challenge = challenge_fixture()
-    {:ok, match} = Fortymm.Matches.create_match(challenge)
+    user = user_fixture()
+    {:ok, match} = Fortymm.Matches.create_match(challenge, user)
     match
   end
 end
