@@ -53,7 +53,7 @@ defmodule FortymmWeb.ChallengeLive do
          |> put_flash(:error, "You can't accept your own challenge")}
 
       true ->
-        with {:ok, match} <- Matches.create_match(challenge) do
+        with {:ok, match} <- Matches.create_match(challenge, current_user) do
           {:noreply, redirect(socket, to: ~p"/matches/#{match.id}")}
         else
           _ ->

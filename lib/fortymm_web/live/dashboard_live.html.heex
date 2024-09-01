@@ -1,37 +1,81 @@
-<section class="max-w-96">
-  <div class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
-    <div class="px-4 py-5 sm:p-6">
-      <h3 class="text-base font-semibold leading-6 text-gray-900 text-center">
-        Challenge A Friend
-      </h3>
+<div class="grid grid-cols-1 sm:grid-cols-2">
+  <section class="sm:max-w-96">
+    <div class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-base font-semibold leading-6 text-gray-900 text-center">
+          Challenge A Friend
+        </h3>
 
-      <.simple_form for={} phx-submit="create_challenge" id="challenge-to-one-game">
-        <input type="hidden" name="maximum_number_of_games" value="1" />
-        <:actions>
-          <.button class="w-full">to just 1 game</.button>
-        </:actions>
-      </.simple_form>
+        <.simple_form for={} phx-submit="create_challenge" id="challenge-to-one-game">
+          <input type="hidden" name="maximum_number_of_games" value="1" />
+          <:actions>
+            <.button class="w-full">to just 1 game</.button>
+          </:actions>
+        </.simple_form>
 
-      <.simple_form for={} phx-submit="create_challenge">
-        <input type="hidden" name="maximum_number_of_games" value="3" />
-        <:actions>
-          <.button class="w-full">to a best of 3</.button>
-        </:actions>
-      </.simple_form>
+        <.simple_form for={} phx-submit="create_challenge">
+          <input type="hidden" name="maximum_number_of_games" value="3" />
+          <:actions>
+            <.button class="w-full">to a best of 3</.button>
+          </:actions>
+        </.simple_form>
 
-      <.simple_form for={} phx-submit="create_challenge">
-        <input type="hidden" name="maximum_number_of_games" value="5" />
-        <:actions>
-          <.button class="w-full">to a best of 5</.button>
-        </:actions>
-      </.simple_form>
+        <.simple_form for={} phx-submit="create_challenge">
+          <input type="hidden" name="maximum_number_of_games" value="5" />
+          <:actions>
+            <.button class="w-full">to a best of 5</.button>
+          </:actions>
+        </.simple_form>
 
-      <.simple_form for={} phx-submit="create_challenge">
-        <input type="hidden" name="maximum_number_of_games" value="7" />
-        <:actions>
-          <.button class="w-full">to a best of 7</.button>
-        </:actions>
-      </.simple_form>
+        <.simple_form for={} phx-submit="create_challenge">
+          <input type="hidden" name="maximum_number_of_games" value="7" />
+          <:actions>
+            <.button class="w-full">to a best of 7</.button>
+          </:actions>
+        </.simple_form>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+
+  <%= if @matches != [] do %>
+    <section class="sm:max-w-96">
+      <div class="rounded-lg bg-gray-50 shadow-sm ring-1 ring-gray-900/5">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-base font-semibold leading-6 text-gray-900 text-center pb-5">
+            Your Current Matches
+          </h3>
+          <ul class="grid grid-cols-1 gap-2">
+            <%= for match <- @matches do %>
+              <li class="divide-y divide-gray-200 rounded-lg bg-white border border-gray-300 hover:border-gray-400">
+                <.link href={~p"/matches/#{match.id}"} class="focus:outline-none">
+                  <div class="flex w-full items-center justify-between space-x-6 p-6">
+                    <div class="flex flex-1 justify-center items-center space-x-3">
+                      <h3 class="truncate text-sm font-medium text-gray-900">
+                        <%= Enum.at(match.match_participants, 0).user.username %>
+                      </h3>
+                    </div>
+                    <div class="text-sm font-light">
+                      vs
+                    </div>
+                    <div class="flex flex-1 justify-center items-center space-x-3">
+                      <h3 class="truncate text-sm font-medium text-gray-900">
+                        <%= Enum.at(match.match_participants, 1).user.username %>
+                      </h3>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="-mt-px flex">
+                      <div class="flex flex-1 rounded-b py-4 items-center justify-center text-white bg-green-600">
+                        Waiting To Start
+                      </div>
+                    </div>
+                  </div>
+                </.link>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </section>
+  <% end %>
+</div>
