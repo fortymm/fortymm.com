@@ -5,6 +5,7 @@ defmodule Fortymm.Matches.Match do
 
   alias Fortymm.Matches.MatchParticipant
   alias Fortymm.Challenges.Challenge
+  alias Fortymm.Matches.Game
   alias __MODULE__
 
   schema "matches" do
@@ -13,6 +14,7 @@ defmodule Fortymm.Matches.Match do
 
     has_one :challenge, Challenge
     has_many :match_participants, MatchParticipant
+    has_many :games, Game
 
     timestamps(type: :utc_datetime)
   end

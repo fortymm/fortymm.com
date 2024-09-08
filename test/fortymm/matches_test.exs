@@ -37,7 +37,7 @@ defmodule Fortymm.MatchesTest do
   test "get_match! returns the match with the given id" do
     match = match_fixture()
 
-    assert ^match = Matches.get_match!(match.id)
+    assert match.id == Matches.get_match!(match.id).id
   end
 
   test "get_match! raises an error if the match does not exist" do

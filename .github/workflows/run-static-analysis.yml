@@ -28,18 +28,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: end-to-end-tests/package-lock.json
           
       - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
           elixir-version: ${{ matrix.elixir }}
+
       - name: Install dependencies
-        run: |
-          mix deps.get
-          npm ci --prefix end-to-end-tests
- 
+        run: mix deps.get
+
       - name: Check for compile warnings
         run: mix compile --warnings-as-errors
 
@@ -49,12 +46,17 @@ jobs:
       - name: Run unit tests
         run: mix test
 
-      - name: Run end to end tests
+      - name: Start web server
         run: |
           mix ecto.setup
           mix phx.server &
-          npx playwright install  --with-deps
-          npm run test --prefix end-to-end-tests
+
+      - name: Run end-to-end tests
+        working-directory: end-to-end-tests
+        run: |
+          npm install --force
+          npx playwright install --with-deps
+          npm run test
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
