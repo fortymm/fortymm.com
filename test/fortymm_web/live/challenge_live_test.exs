@@ -58,7 +58,7 @@ defmodule FortymmWeb.ChallengeLiveTest do
              |> render_submit()
   end
 
-  test "redirects to the match page after creating the match", %{conn: conn} do
+  test "redirects to the new score page after creating the match", %{conn: conn} do
     challenger = user_fixture()
     challenge = challenge_fixture(%{created_by_id: challenger.id})
 
@@ -67,14 +67,12 @@ defmodule FortymmWeb.ChallengeLiveTest do
       |> log_in_user(user_fixture())
       |> live(~p"/challenges/#{challenge.slug}")
 
-    {:error, {:redirect, %{to: "/matches/" <> match_id}}} =
+    {:error, {:redirect, %{to: score_url}}} =
       lv
       |> element("#accept-challenge-form")
       |> render_submit()
 
-    redirect_url = "/matches/#{match_id}"
-
-    assert {:error, {:redirect, %{to: ^redirect_url}}} =
+    assert {:error, {:redirect, %{to: ^score_url}}} =
              conn
              |> log_in_user(user_fixture())
              |> live(~p"/challenges/#{challenge.slug}")

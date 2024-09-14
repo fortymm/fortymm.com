@@ -4,6 +4,7 @@ defmodule Fortymm.Matches.Match do
   import Ecto.Query
 
   alias Fortymm.Matches.MatchParticipant
+  alias Fortymm.Repo
   alias Fortymm.Challenges.Challenge
   alias Fortymm.Matches.Game
   alias __MODULE__
@@ -32,11 +33,19 @@ defmodule Fortymm.Matches.Match do
     )
   end
 
+  def load_participants(match) do
+    Repo.preload(match, match_participants: :user)
+  end
+
   def create_from_challenge_changeset(%Challenge{} = challenge) do
     %Match{}
     |> cast(%{}, [])
     |> put_change(:maximum_number_of_games, challenge.maximum_number_of_games)
     |> put_change(:status, "pending")
     |> validate_inclusion(:maximum_number_of_games, valid_maximum_number_of_games())
+  end
+
+  def load_games(match) do
+    Repo.preload(match, :games)
   end
 end

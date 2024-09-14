@@ -1,5 +1,6 @@
 defmodule Fortymm.Matches.Game do
   use Ecto.Schema
+  import Ecto.Query
   import Ecto.Changeset
   alias Fortymm.Matches.Match
 
@@ -9,6 +10,10 @@ defmodule Fortymm.Matches.Game do
     belongs_to :match, Match
 
     timestamps(type: :utc_datetime)
+  end
+
+  def for_match(query, match_id) do
+    from(g in query, where: g.match_id == ^match_id)
   end
 
   @doc false
