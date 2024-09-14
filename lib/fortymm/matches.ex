@@ -10,6 +10,12 @@ defmodule Fortymm.Matches do
 
   import Ecto.Query
 
+  def ensure_game_belongs_to_match!(match, game_id) do
+    Game
+    |> Game.for_match(match.id)
+    |> Repo.get!(game_id)
+  end
+
   def list_matches_for_user(user) do
     Match
     |> Match.for_participant(user)

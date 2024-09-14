@@ -4,6 +4,7 @@ defmodule FortymmWeb.ChallengeLive do
 
   alias Fortymm.Challenges
   alias Fortymm.Matches
+  alias Fortymm.Matches.Match
   alias Fortymm.Challenges.Challenge
   alias Fortymm.Challenges.Updates
 
@@ -22,10 +23,16 @@ defmodule FortymmWeb.ChallengeLive do
          |> assign(challenge: challenge)}
 
       match_id ->
+        [first_game] =
+          match_id
+          |> Matches.get_match!()
+          |> Match.load_games()
+          |> Map.fetch!(:games)
+
         {:noreply,
          socket
          |> put_flash(:info, "The challenge has already been accepted")
-         |> redirect(to: ~p"/matches/#{match_id}")}
+         |> redirect(to: ~p"/matches/#{match_id}/games/#{first_game.id}/scores/new")}
     end
   end
 
@@ -40,7 +47,10 @@ defmodule FortymmWeb.ChallengeLive do
   end
 
   def handle_info(challenge, socket) do
-    {:noreply, redirect(socket, to: ~p"/matches/#{challenge.match_id}")}
+    {:noreply,
+     redirect(socket,
+       to: ~p"/matches/#{challenge.match_id}/games/#{challenge.first_game_id}/scores/new"
+     )}
   end
 
   def handle_event("accept_challenge", _unsigned_params, socket) do
@@ -54,7 +64,10 @@ defmodule FortymmWeb.ChallengeLive do
 
       true ->
         with {:ok, match} <- Matches.create_match(challenge, current_user) do
-          {:noreply, redirect(socket, to: ~p"/matches/#{match.id}")}
+          [first_game] = match.games
+
+          {:noreply,
+           redirect(socket, to: ~p"/matches/#{match.id}/games/#{first_game.id}/scores/new")}
         else
           _ ->
             {:noreply,
