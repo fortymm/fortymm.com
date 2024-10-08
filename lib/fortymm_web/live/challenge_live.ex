@@ -47,9 +47,15 @@ defmodule FortymmWeb.ChallengeLive do
   end
 
   def handle_info(challenge, socket) do
+    [first_game] =
+      challenge.match_id
+      |> Matches.get_match!()
+      |> Match.load_games()
+      |> Map.fetch!(:games)
+
     {:noreply,
      redirect(socket,
-       to: ~p"/matches/#{challenge.match_id}/games/#{challenge.first_game_id}/scores/new"
+       to: ~p"/matches/#{challenge.match_id}/games/#{first_game.id}/scores/new"
      )}
   end
 

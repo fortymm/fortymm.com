@@ -3,6 +3,7 @@ defmodule Fortymm.MatchesTest do
   use Fortymm.DataCase
 
   alias Fortymm.Matches
+  alias Fortymm.Matches.Match
   alias Fortymm.Challenges.Challenge
   alias Fortymm.Challenges
 
@@ -83,5 +84,63 @@ defmodule Fortymm.MatchesTest do
     assert_raise KeyError, fn ->
       Matches.create_match(challenge, user)
     end
+  end
+
+  test "create_score_proposal/1 creates a score proposal with valid attributes" do
+    game = game_fixture()
+
+    [first_participant, second_participant] =
+      game
+      |> Map.get(:match_id)
+      |> Matches.get_match!()
+      |> Match.load_participants()
+      |> Map.get(:match_participants)
+
+    {:ok, score_proposal} =
+      Matches.create_score_proposal(%{
+        game_id: game.id,
+        entered_by_id: first_participant.user_id,
+        game_scores: [
+          %{
+            match_participant_id: first_participant.id,
+            score: 11
+          },
+          %{
+            match_participant_id: second_participant.id,
+            score: 9
+          }
+        ]
+      })
+
+    [first_score, second_score] = score_proposal.game_scores
+    assert score_proposal.game_id == game.id
+    assert score_proposal.entered_by_id == first_participant.user_id
+    assert score_proposal.id != nil
+
+    assert first_score.score == 11
+    assert first_score.match_participant_id == first_participant.id
+    assert first_score.id != nil
+
+    assert second_score.score == 9
+    assert second_score.match_participant_id == second_participant.id
+    assert second_score.id != nil
+  end
+
+  test "create_score_proposal/1 returns an error with invalid attributes" do
+    game = game_fixture()
+
+    [first_participant, _second_participant] =
+      game
+      |> Map.get(:match_id)
+      |> Matches.get_match!()
+      |> Match.load_participants()
+      |> Map.get(:match_participants)
+
+    assert {:error, _changeset} =
+             Matches.create_score_proposal(%{
+               game_id: game.id,
+               entered_by_id: first_participant.user_id,
+               game_scores: []
+             })
   end
 end

@@ -7,8 +7,24 @@ defmodule Fortymm.Matches do
   alias Fortymm.Accounts.User
   alias Fortymm.Matches.Game
   alias Ecto.Multi
-
+  alias Fortymm.Matches.GameScoreProposal
   import Ecto.Query
+
+  def create_score_proposal(attrs) do
+    %GameScoreProposal{}
+    |> GameScoreProposal.create_changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def score_proposal_changeset(%Match{match_participants: match_participants}, game_id) do
+    match_participant_ids = Enum.map(match_participants, & &1.id)
+
+    %GameScoreProposal{}
+    |> GameScoreProposal.propose_scoring_changeset(%{
+      game_id: game_id,
+      match_participant_ids: match_participant_ids
+    })
+  end
 
   def ensure_game_belongs_to_match!(match, game_id) do
     Game

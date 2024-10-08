@@ -73,6 +73,9 @@ defmodule FortymmWeb.Router do
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
       live "/dashboard", DashboardLive, :show
       live "/matches/:match_id/games/:game_id/scores/new", MatchLive.NewScore
+
+      live "/matches/:match_id/games/:game_id/scores/:score_id/validations/new",
+           MatchLive.ScoreValidation
     end
   end
 

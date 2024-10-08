@@ -14,4 +14,7 @@ defmodule Fortymm.MatchesFixtures do
     {:ok, match} = Fortymm.Matches.create_match(challenge, user)
     match
   end
+
+  def game_score_proposal_fixture() do
+  end
 end
