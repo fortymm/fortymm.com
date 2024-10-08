@@ -20,7 +20,7 @@ defmodule FortymmWeb.MatchLive.NewScoreTest do
       |> log_in_user(first_participant.user)
       |> live(~p"/matches/#{match.id}/games/#{first_game.id}/scores/new")
 
-    assert html =~ "New Score"
+    assert html =~ "Enter the scores for game #1 in your match against"
   end
 
   test "redirects to the match page when no user is logged in", %{conn: conn} do
@@ -67,5 +67,53 @@ defmodule FortymmWeb.MatchLive.NewScoreTest do
       |> log_in_user(user_fixture())
       |> live(~p"/matches/#{match.id}/games/#{game.id}/scores/new")
     end
+  end
+
+  test "redirects to the validation page when a valid score is entered", %{conn: conn} do
+    match =
+      match_fixture()
+      |> Match.load_participants()
+
+    [first_game] = match.games
+    first_participant = List.first(match.match_participants)
+
+    {:ok, view, _html} =
+      conn
+      |> log_in_user(first_participant.user)
+      |> live(~p"/matches/#{match.id}/games/#{first_game.id}/scores/new")
+
+    assert {:error, {:redirect, %{to: score_url}}} =
+             view
+             |> element("#new-score-form")
+             |> render_submit(%{
+               "game_score_proposal" => %{
+                 "game_scores" => %{"0" => %{"score" => "6"}, "1" => %{"score" => "11"}}
+               }
+             })
+
+    assert score_url =~
+             ~r|^/matches/#{match.id}/games/#{first_game.id}/scores/\d+/validations/new$|
+  end
+
+  test "does not redirect when the score is not valid", %{conn: conn} do
+    match =
+      match_fixture()
+      |> Match.load_participants()
+
+    [first_game] = match.games
+    first_participant = List.first(match.match_participants)
+
+    {:ok, view, _html} =
+      conn
+      |> log_in_user(first_participant.user)
+      |> live(~p"/matches/#{match.id}/games/#{first_game.id}/scores/new")
+
+    assert view
+           |> element("#new-score-form")
+           |> render_submit(%{
+             "game_score_proposal" => %{
+               "game_scores" => %{"0" => %{"score" => "6"}, "1" => %{"score" => "1"}}
+             }
+           }) =~ "Enter the scores for game #1 in your match against"
   end
 end
