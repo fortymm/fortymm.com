@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :matches, only: [ :show ]
+
   devise_for :users
   get "landing_page/index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
